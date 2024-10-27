@@ -1,4 +1,6 @@
 
+import java.util.Scanner;
+
 abstract class Account {
     protected String customerName;
     protected String accountNumber;
@@ -26,12 +28,20 @@ class SavAcct extends Account {
 
     @Override
     public void deposit(double amount) {
+        if (amount <= 0) {
+            System.out.println("Deposit amount must be positive.");
+            return;
+        }
         balance += amount;
         System.out.println("Deposited: " + amount);
     }
 
     @Override
     public void withdraw(double amount) {
+        if (amount <= 0) {
+            System.out.println("Withdrawal amount must be positive.");
+            return;
+        }
         if (amount > balance) {
             System.out.println("Insufficient funds for withdrawal.");
         } else {
@@ -48,7 +58,7 @@ class SavAcct extends Account {
 
     @Override
     public void displayBalance() {
-        System.out.println("Savings Account Balance: " + balance);
+        System.out.println(String.format("Savings Account Balance: %.2f", balance));
     }
 }
 
@@ -63,12 +73,20 @@ class CurAcct extends Account {
 
     @Override
     public void deposit(double amount) {
+        if (amount <= 0) {
+            System.out.println("Deposit amount must be positive.");
+            return;
+        }
         balance += amount;
         System.out.println("Deposited: " + amount);
     }
 
     @Override
     public void withdraw(double amount) {
+        if (amount <= 0) {
+            System.out.println("Withdrawal amount must be positive.");
+            return;
+        }
         if (amount > balance) {
             System.out.println("Insufficient funds for withdrawal.");
         } else {
@@ -87,28 +105,58 @@ class CurAcct extends Account {
 
     @Override
     public void displayBalance() {
-        System.out.println("Current Account Balance: " + balance);
+        System.out.println(String.format("Current Account Balance: %.2f", balance));
     }
 }
 
-// Main class to demonstrate functionality
+// Main class 
 public class Bank {
     public static void main(String[] args) {
-        // Create a savings account
-        SavAcct savingsAccount = new SavAcct("Alice", "SAV123", 5.0);
-        savingsAccount.deposit(2000);
-        savingsAccount.computeAndDepositInterest();
-        savingsAccount.displayBalance();
-        savingsAccount.withdraw(500);
-        savingsAccount.displayBalance();
+        Scanner scanner = new Scanner(System.in);
 
-        // Create a current account
-        CurAcct currentAccount = new CurAcct("Bob", "CUR123");
-        currentAccount.deposit(1200);
-        currentAccount.displayBalance();
-        currentAccount.withdraw(300);
-        currentAccount.displayBalance();
-        currentAccount.withdraw(1000); // This will incur a service charge
-        currentAccount.displayBalance();
+        System.out.println("Choose account type (1: Savings, 2: Current): ");
+        int accountType = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.print("Enter customer name: ");
+        String customerName = scanner.nextLine();
+        System.out.print("Enter account number: ");
+        String accountNumber = scanner.nextLine();
+
+        Account account;
+        if (accountType == 1) {
+            System.out.print("Enter interest rate: ");
+            double interestRate = scanner.nextDouble();
+            account = new SavAcct(customerName, accountNumber, interestRate);
+        } else {
+            account = new CurAcct(customerName, accountNumber);
+        }
+
+        while (true) {
+            System.out.println("\nChoose an operation: 1: Deposit, 2: Withdraw, 3: Display Balance, 4: Exit");
+            int operation = scanner.nextInt();
+
+            switch (operation) {
+                case 1:
+                    System.out.print("Enter amount to deposit: ");
+                    double depositAmount = scanner.nextDouble();
+                    account.deposit(depositAmount);
+                    break;
+                case 2:
+                    System.out.print("Enter amount to withdraw: ");
+                    double withdrawAmount = scanner.nextDouble();
+                    account.withdraw(withdrawAmount);
+                    break;
+                case 3:
+                    account.displayBalance();
+                    break;
+                case 4:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid operation. Please choose again.");
+            }
+        }
     }
 }
